@@ -1,0 +1,78 @@
+import java.sql.DriverManager;
+
+import java.sql.SQLException;
+import java.sql.Statement;
+
+/**
+ *
+ * @author nikola
+ */
+public class DbUtil {
+
+    public static Connection connection = null;
+    private static String url = "jdbc:mysql://localhost/";
+    private static String dbName = "fudbalski_klub";
+    private static String username = "root";
+    private static String password = "";
+
+    /**
+     *
+     * Kreiramo bazu podataka sa tabelama.
+     *
+     * @throws SQLException Izuzetak koji nam daje informacije o gresci u radu
+     * sa bazom.
+     *
+     */
+    public static void createDatabase() throws SQLException {
+        connection = DriverManager.getConnection(url, username, password);
+        Statement statement = connection.createStatement();
+        statement.execute("CREATE DATABASE IF NOT EXISTS fudbalski_klub;");
+        statement.execute("USE fudbalski_klub;");
+
+        statement.execute("CREATE TABLE IF NOT EXISTS liga(\n"
+                + "liga_Id INT AUTO_INCREMENT PRIMARY KEY,\n"
+                + "liga_Ime VARCHAR(50)\n"
+                + ");");
+
+        statement.execute("CREATE TABLE IF NOT EXISTS klub(\n"
+                + "klub_Id INT AUTO_INCREMENT PRIMARY KEY,\n"
+                + "klub_Ime VARCHAR(50) NOT NULL UNIQUE,\n"
+                + "klub_Broj_Pobeda INT NOT NULL,\n"
+                + "klub_Budzet DOUBLE NOT NULL, \n"
+                + "liga_Id INT NOT NULL, \n"
+                + "FOREIGN KEY (liga_Id) REFERENCES liga (liga_Id) \n"
+                + ");");
+
+        statement.execute("CREATE TABLE IF NOT EXISTS igrac(\n"
+                + "igrac_Id INT AUTO_INCREMENT PRIMARY KEY,\n"
+                + "igrac_Ime VARCHAR(50) NOT NULL,\n"
+                + "Igrac_Godina_Rodjenja INT NOT NULL,\n"
+                + "igrac_Cena DOUBLE NOT NULL, \n"
+                + "klub_Id INT NOT NULL, \n"
+                + "FOREIGN KEY (klub_Id) REFERENCES klub (klub_Id) \n"
+                + ");");
+
+    }
+
+    /**
+     *
+     * Otvaramo konekciju sa bazom.
+     *
+     * @throws SQLException Izuzetak koji nam daje informacije o gresci u radu
+     * sa bazom.
+     */
+    public static void openConnection() throws SQLException {
+        connection = DriverManager.getConnection("jdbc:mysql://localhost/" + "fudbalski_klub", "root", "");
+    }
+
+    /**
+     *
+     * Zatvaramo konekciju sa bazom.
+     *
+     * @throws SQLException Izuzetak koji nam daje informacije o gresci u radu
+     * sa bazom.
+     */
+    public static void closeConnection() throws SQLException {
+        connection.close();
+    }
+}
